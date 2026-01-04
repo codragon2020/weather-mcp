@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
+import { prompts } from './prompts/index.js';
 import { tools } from './tools/index.js';
 
 const server = new McpServer({
@@ -32,6 +33,18 @@ for (const tool of tools) {
 				structuredContent: output,
 			};
 		}
+	);
+}
+
+for (const prompt of prompts) {
+	server.registerPrompt(
+		prompt.name,
+		{
+			title: prompt.title,
+			description: prompt.description,
+			argsSchema: prompt.argsSchema,
+		},
+		(args: any, _extra: any) => prompt.handler(args)
 	);
 }
 

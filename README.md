@@ -153,6 +153,39 @@ MCP clients vary, but conceptually tool calls look like:
 }
 ```
 
+## Prompt templates
+
+This server also exposes prompt templates (MCP prompts). Prompts are reusable message templates that clients can request.
+
+- `summarize_current_weather`
+- `summarize_forecast`
+
+### Example prompt usage
+
+After you call tools like `get_weather` / `get_forecast`, take the returned structured JSON and pass it into the prompt args.
+
+#### summarize_current_weather
+
+Args example:
+
+```json
+{
+	"locationName": "Boston, MA",
+	"weatherJson": "{\"lat\":42.35843,\"lon\":-71.05977,\"units\":\"metric\",\"temperature\":{\"value\":-2.6,\"unit\":\"C\"},\"windSpeed\":{\"value\":10.7,\"unit\":\"km/h\"},\"humidity\":{\"value\":65,\"unit\":\"%\"},\"condition\":{\"code\":3,\"description\":\"overcast\"}}"
+}
+```
+
+#### summarize_forecast
+
+Args example:
+
+```json
+{
+	"locationName": "Boston, MA",
+	"forecastJson": "{\"daily\":[{\"date\":\"2026-01-04\",\"temperatureMax\":{\"value\":5.2,\"unit\":\"C\"},\"temperatureMin\":{\"value\":-6.2,\"unit\":\"C\"},\"condition\":{\"code\":71,\"description\":\"snow\"}}]}"
+}
+```
+
 ## Checklist
 
 - Server starts successfully via stdio

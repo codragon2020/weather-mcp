@@ -15,6 +15,10 @@ async function main() {
 
 	await client.connect(transport);
 
+	const prompts = await client.listPrompts();
+	console.log('\n== prompts ==');
+	console.log(JSON.stringify(prompts, null, 2));
+
 	const tools = await client.listTools();
 	console.log('\n== tools ==');
 	console.log(JSON.stringify(tools, null, 2));
@@ -40,6 +44,33 @@ async function main() {
 			arguments: { lat, lon, units: 'metric' },
 		});
 		console.log(JSON.stringify(weather, null, 2));
+
+		const weatherJson = weather.structuredContent as
+			| {
+					error: false;
+					data: {
+						lat: number;
+						lon: number;
+						units: 'metric' | 'imperial';
+						temperature: { value: number; unit: string };
+						condition: { code: number; description: string };
+						windSpeed?: { value: number; unit: string };
+						humidity?: { value: number; unit: string };
+					};
+			  }
+			| { error: true; code: string; message: string };
+
+		if (weatherJson && weatherJson.error === false) {
+			console.log('\n== prompt: summarize_current_weather ==');
+			const promptResult = await client.getPrompt({
+				name: 'summarize_current_weather',
+				arguments: {
+					locationName: name,
+					weatherJson: JSON.stringify(weatherJson.data),
+				} as any,
+			});
+			console.log(JSON.stringify(promptResult, null, 2));
+		}
 
 		console.log('\n== get_forecast ==');
 		const forecast = await client.callTool({
